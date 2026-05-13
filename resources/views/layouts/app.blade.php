@@ -14,21 +14,21 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
 
-    <body class="font-sans antialiased bg-gray-100 text-gray-900 h-screen overflow-hidden">
-        <div class="flex h-full"> 
+    <body class="font-sans antialiased bg-gray-100 text-gray-900 lg:h-screen lg:overflow-hidden">
+        <div class="flex flex-col lg:flex-row h-full"> 
             <div class="flex-shrink-0">
                 @include('layouts.navigation') 
             </div>
 
-            <div class="flex-1 flex flex-col overflow-y-auto">
+            <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
                 @isset($header)
                     <header class="bg-white shadow">
-                        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
                             {{ $header }}
                         </div>
                     </header>
                 @endisset
-                <main class="p-6">
+                <main class="p-4 sm:p-6">
                     {{ $slot }}
                 </main>
             </div>
