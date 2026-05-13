@@ -25,7 +25,8 @@ Route::middleware('auth')->group(function () {
             Route::delete('/trash/{id}/force', [TrashController::class, 'forceDelete'])->name('trash.forceDelete');
         });
     });
-    
+    Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
 
     Route::prefix('customers')->name('customers.')->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('index');
