@@ -16,17 +16,16 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 Route::middleware('auth')->group(function () {
     Route::middleware('can:admin')->group(function () {
-        Route::resource('users', UserController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        Route::resource('users', UserController::class);
+        
+        // Trash/System Archive
+        Route::prefix('admin')->group(function () {
+            Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
+            Route::post('/trash/{id}/restore', [TrashController::class, 'restore'])->name('trash.restore');
+            Route::delete('/trash/{id}/force', [TrashController::class, 'forceDelete'])->name('trash.forceDelete');
+        });
     });
-    Route::middleware('auth')->group(function () {
-        Route::resource('users', UserController::class)->only(['edit', 'update']);
-    });
-
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
-    Route::post('/trash/{id}/restore', [TrashController::class, 'restore'])->name('trash.restore');
-    Route::delete('/trash/{id}/force', [TrashController::class, 'forceDelete'])->name('trash.forceDelete');
-});
+    
 
     Route::prefix('customers')->name('customers.')->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('index');
