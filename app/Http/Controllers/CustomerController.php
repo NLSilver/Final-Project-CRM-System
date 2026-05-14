@@ -11,7 +11,8 @@ class CustomerController extends Controller
     {
         $user = auth()->user();
         $search = $request->query('search');
-
+        
+        
         if (in_array($user->role, ['admin', 'manager'])) {
             $query = Customer::with('user');
         } else {
@@ -26,12 +27,24 @@ class CustomerController extends Controller
             });
         }
 
-        $allCustomers = $query->get();
-        $customers = $allCustomers->groupBy('status');
-        $activeCount = $allCustomers->where('status', 'Active')->count();
-        $inactiveCount = $allCustomers->where('status', 'Inactive')->count();
+        $activeCustomers = (clone $query)
+            ->where('status', 'Active')
+            ->latest()
+            ->paginate(5, ['*'], 'active_page');
 
-        return view('customers.index', compact('customers', 'activeCount', 'inactiveCount', 'search'));
+        
+        $inactiveCustomers = (clone $query)
+            ->where('status', 'Inactive')
+            ->latest()
+            ->paginate(5, ['*'], 'inactive_page');
+
+        return view('customers.index', [
+            'activeCustomers'   => $activeCustomers,
+            'inactiveCustomers' => $inactiveCustomers,
+            'activeCount'       => (clone $query)->where('status', 'Active')->count(),
+            'inactiveCount'     => (clone $query)->where('status', 'Inactive')->count(),
+            'search'            => $search
+        ]);
     }
 
     public function create()

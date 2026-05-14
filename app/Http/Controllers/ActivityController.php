@@ -50,8 +50,8 @@ class ActivityController extends Controller
             $customerQuery->whereDate('activity_date', '<=', $endDate);
         }
 
-        $leadActivities = $leadQuery->get();
-        $customerActivities = $customerQuery->get();
+        $customerActivities = $customerQuery->latest()->paginate(10, ['*'], 'customer_page');
+        $leadActivities = $leadQuery->latest()->paginate(10, ['*'], 'lead_page');
         
         $users = collect();
         if ($user->role === 'admin') {

@@ -42,8 +42,17 @@ class FollowUpController extends Controller
             });
         }
 
-        $followUps = $query->latest()->get();
-        return view('follow-ups.index', compact('followUps', 'users'));
+        $pendingFollowUps = (clone $query)
+            ->where('status', 'pending')
+            ->orderBy('due_date', 'asc')
+            ->paginate(10, ['*'], 'pending_page');
+
+        $completedFollowUps = (clone $query)
+            ->where('status', 'completed')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10, ['*'], 'completed_page');
+
+        return view('follow-ups.index', compact('pendingFollowUps', 'completedFollowUps', 'users'));
     }
 
     public function create()

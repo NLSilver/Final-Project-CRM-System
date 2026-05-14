@@ -24,10 +24,10 @@ class TrashController extends Controller
         $activeType = $request->query('type', 'customers');
         
         $items = match($activeType) {
-            'leads'      => Lead::onlyTrashed()->latest('deleted_at')->get(),
-            'activities' => Activity::onlyTrashed()->latest('deleted_at')->get(),
-            'followups'  => FollowUp::onlyTrashed()->latest('deleted_at')->get(),
-            default      => Customer::onlyTrashed()->latest('deleted_at')->get(),
+            'leads'      => Lead::onlyTrashed()->latest('deleted_at')->paginate(10),
+            'activities' => Activity::onlyTrashed()->latest('deleted_at')->paginate(10),
+            'followups'  => FollowUp::onlyTrashed()->latest('deleted_at')->paginate(10),
+            default      => Customer::onlyTrashed()->latest('deleted_at')->paginate(10),
         };
 
        return view('trash.index', compact('items', 'activeType', 'tabs'));

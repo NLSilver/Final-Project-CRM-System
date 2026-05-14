@@ -32,7 +32,7 @@ class LeadController extends Controller
             $query->where('status', $request->status);
         }
 
-        $leads = $query->orderBy('created_at', 'desc')->get();
+        $leads = $query->orderBy('created_at', 'desc')->paginate(10);
         return view('leads.index', compact('leads', 'search'));
     }
 

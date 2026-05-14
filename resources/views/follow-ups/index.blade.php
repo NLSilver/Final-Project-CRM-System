@@ -39,80 +39,51 @@
         </form>
     </div>
 
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
+    <div class="mb-12">
+        <h2 class="px-2 mb-3 text-[10px] font-bold uppercase text-amber-600 tracking-widest flex items-center">
+            <span class="mr-2">●</span> Pending Tasks (Nearest Due First)
+        </h2>
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
             <table class="min-w-full divide-y divide-gray-100">
                 <tbody class="divide-y divide-gray-50">
-                    @forelse($followUps as $f)
-                        @php $isOverdue = $f->status === 'pending' && \Carbon\Carbon::parse($f->due_date)->isPast(); @endphp
-                        <tr class="hover:bg-gray-50/50 transition group">
-                            <td class="px-4 sm:px-6 py-4">
-                                <div class="flex flex-wrap items-center gap-3 mb-1">
-                                    <span class="px-2 py-0.5 text-[9px] font-bold uppercase rounded-full {{ $f->customer_id ? 'bg-blue-100 text-blue-700' : 'bg-teal-100 text-teal-700' }}">
-                                        {{ $f->customer_id ? 'Customer' : 'Lead' }}
-                                    </span>
-                                    <span class="text-[10px] font-bold uppercase {{ $isOverdue ? 'text-red-500 animate-pulse' : 'text-gray-400' }}">
-                                        Due: {{ $f->due_date }} {{ $isOverdue ? '(Overdue)' : '' }}
+                    @forelse($pendingFollowUps as $f)
+                        @php $isOverdue = \Carbon\Carbon::parse($f->due_date)->isPast(); @endphp
+                        <tr class="hover:bg-gray-50/50 transition">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <span class="text-[10px] font-bold uppercase {{ $isOverdue ? 'text-red-500 animate-pulse' : 'text-amber-500' }}">
+                                        Due: {{ $f->due_date }} {{ $isOverdue ? '(OVERDUE)' : '' }}
                                     </span>
                                 </div>
-                                
                                 <p class="text-sm font-bold text-gray-800">
-                                    @if($f->customer)
-                                        <span class="text-blue-600">{{ $f->customer->first_name }} {{ $f->customer->last_name }}</span>
-                                    @elseif($f->lead)
-                                        <span class="text-teal-600">{{ $f->lead->name }}</span>
-                                    @else
-                                        <span class="text-gray-400">No Contact</span>
-                                    @endif
-                                    <span class="mx-2 text-gray-300">|</span>
+                                    {{ $f->customer->full_name ?? $f->lead->name ?? 'Contact' }} 
+                                    <span class="mx-2 text-gray-300">|</span> 
                                     {{ $f->title }}
                                 </p>
-                                
-                                <p class="text-xs text-gray-500 italic mt-1 line-clamp-2 sm:line-clamp-none">{{ $f->description }}</p>
-                                
-                                <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-                                    <span class="text-[10px] text-teal-600 font-bold uppercase">
-                                        Staff: {{ $f->user->name ?? 'Unassigned' }}
-                                    </span>
-                                    <span class="hidden sm:inline text-gray-300">|</span>
-                                    <span class="text-[10px] text-gray-400 font-bold uppercase">
-                                        By: {{ $f->assignedBy->name ?? 'System' }}
-                                    </span>
-                                    @if($f->status === 'completed')
-                                        <span class="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase">
-                                            ✓ Done
-                                        </span>
-                                    @else
-                                        <span class="text-[9px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold uppercase">
-                                            Pending
-                                        </span>
-                                    @endif
+                                <p class="text-xs text-gray-500 italic mt-1">{{ $f->description }}</p>
+                                <div class="mt-2 text-[10px] text-gray-400 font-bold uppercase">
+                                    Assigned to: {{ $f->user->name }}
                                 </div>
                             </td>
-                            
-                            <td class="px-4 py-3 text-sm whitespace-nowrap">
-                                <div class="flex items-center justify-end gap-x-3">
-                                    @if($f->status === 'pending')
-                                        <form method="POST" action="{{ route('follow-ups.complete', $f->id) }}" class="flex items-center">
-                                            @csrf
-                                            <button type="submit" class="group p-1" title="Mark as Done">
-                                                <svg class="w-5 h-5 text-gray-400 group-hover:text-green-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                </svg>
-                                            </button>
-                                        </form>
-
-                                        <a href="{{ route('follow-ups.edit', $f->id) }}" class="group p-1" title="Edit">
-                                            <svg class="w-5 h-5 text-gray-400 group-hover:text-teal-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-3">
+                                    <form method="POST" action="{{ route('follow-ups.complete', $f->id) }}">
+                                        @csrf
+                                        <button type="submit" class="text-gray-400 hover:text-green-600 transition" title="Complete">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                             </svg>
-                                        </a>
-                                    @endif
-                                    
-                                    <form method="POST" action="{{ route('follow-ups.destroy', $f->id) }}" class="flex items-center" onsubmit="return confirm('Delete this follow-up?')">
+                                        </button>
+                                    </form>
+                                    <a href="{{ route('follow-ups.edit', $f->id) }}" class="text-gray-400 hover:text-teal-600 transition">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </a>
+                                    <form method="POST" action="{{ route('follow-ups.destroy', $f->id) }}" onsubmit="return confirm('Delete permanently?')">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="group p-1" title="Delete">
-                                            <svg class="w-5 h-5 text-gray-400 group-hover:text-red-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <button type="submit" class="text-gray-400 hover:text-red-600 transition">
+                                            <svg class="w-5 h-5 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                             </svg>
                                         </button>
@@ -121,10 +92,68 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td class="px-6 py-12 text-center text-sm text-gray-400 italic">No follow-ups match your search.</td></tr>
+                        <tr>
+                            <td class="px-6 py-8 text-center text-xs text-gray-400 italic">No pending follow-ups found.</td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
+            <div class="px-4 py-3 bg-gray-50 border-t border-gray-100">
+                {{ $pendingFollowUps->appends(request()->except('pending_page'))->links() }}
+            </div>
         </div>
     </div>
+
+    <div>
+        <h2 class="px-2 mb-3 text-[10px] font-bold uppercase text-green-600 tracking-widest flex items-center">
+            <span class="mr-2">✓</span> Recently Completed (Latest First)
+        </h2>
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden opacity-75">
+            <table class="min-w-full divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-50">
+                    @forelse($completedFollowUps as $f)
+                        <tr class="bg-gray-50/30">
+                            <td class="px-6 py-4">
+                                <div class="text-[10px] font-bold uppercase text-gray-400">
+                                    Finished: {{ $f->updated_at->format('M d, Y') }}
+                                </div>
+                                <p class="text-sm font-bold text-gray-600 line-through decoration-gray-400">
+                                    {{ $f->customer->full_name ?? $f->lead->name ?? 'Contact' }} 
+                                    <span class="mx-2 text-gray-300">|</span> 
+                                    {{ $f->title }}
+                                </p>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <form method="POST" action="{{ route('follow-ups.destroy', $f->id) }}" onsubmit="return confirm('Delete permanently?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-gray-400 hover:text-red-600 transition">
+                                        <svg class="w-5 h-5 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td class="px-6 py-8 text-center text-xs text-gray-400 italic">No completed follow-ups on this page.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+            <div class="px-4 py-3 bg-gray-50 border-t border-gray-100">
+                {{ $completedFollowUps->appends(request()->except('completed_page'))->links() }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchForm = document.getElementById('searchForm');
+        let timeout = null;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => searchForm.submit(), 500);
+        });
+    </script>
 </x-app-layout>

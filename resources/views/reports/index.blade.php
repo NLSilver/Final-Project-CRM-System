@@ -8,15 +8,28 @@
             </div>
             
             <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm w-full lg:w-auto">
-                <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-end gap-4">
+                <form id="reportFilterForm" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-end gap-4">
                     <div class="flex flex-col gap-1">
                         <label class="text-[10px] font-bold text-gray-400 uppercase">Staff Member</label>
-                        <select name="staff_id" onchange="this.form.submit()" class="text-sm border-gray-200 rounded-md focus:ring-teal-500">
-                            <option value="">All Staff</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}" {{ $staffId == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                            @endforeach
-                        </select>
+                        @if(in_array(auth()->user()->role, ['admin', 'manager']))
+                            <select name="staff_id" onchange="this.form.submit()" class="w-full text-sm border-gray-200 rounded-md focus:ring-teal-500">
+                                <option value="">All Staff</option>
+                                @foreach($users as $role => $roleUsers)
+                                    <optgroup label="{{ ucfirst(str_replace('_', ' ', $role)) }}">
+                                        @foreach($roleUsers as $u)
+                                            <option value="{{ $u->id }}" {{ $staffId == $u->id ? 'selected' : '' }}>
+                                                {{ $u->name }}
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
+                        @else
+                            <div class="text-sm font-bold text-gray-700 bg-gray-50 px-3 py-2 rounded-md border border-gray-200">
+                                {{ auth()->user()->name }}
+                            </div>
+                            <input type="hidden" name="staff_id" value="{{ auth()->id() }}">
+                        @endif
                     </div>
 
                     <div class="flex flex-col gap-1">
@@ -30,7 +43,7 @@
                     </div>
                     
                     <div class="flex gap-2 lg:pb-0.5">
-                        <a href="?export=pdf&preview=true&staff_id={{ $staffId }}" 
+                        <a href="{{ route('reports.index', array_merge(request()->all(), ['export' => 'pdf', 'preview' => 'true'])) }}" 
                             target="_blank"
                             class="flex-1 lg:flex-none text-center bg-teal-600 text-white px-4 py-2 rounded-md text-sm font-bold shadow-sm hover:bg-teal-700 transition">
                                 PDF

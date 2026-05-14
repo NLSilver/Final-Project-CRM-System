@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
             <div class="overflow-x-auto">
                 <table class="w-full text-left min-w-[600px]">
                     <thead class="bg-gray-50 text-[10px] uppercase text-gray-400 tracking-wider">
@@ -55,7 +55,7 @@
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-4">
                                         <a href="{{ route('users.edit', $u->id) }}" 
-                                           class="text-gray-300 hover:text-teal-600 transition-colors duration-200" 
+                                           class="text-gray-400 hover:text-teal-600 transition-colors duration-200" 
                                            title="Edit User">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -65,7 +65,7 @@
                                         @if(auth()->id() !== $u->id)
                                         <form method="POST" action="{{ route('users.destroy', $u->id) }}" onsubmit="return confirm('Permanently delete this user account?')">
                                             @csrf @method('DELETE')
-                                            <button class="text-gray-300 hover:text-red-600 transition-colors duration-200" title="Delete User">
+                                            <button class="text-gray-400 hover:text-red-600 transition-colors duration-200" title="Delete User">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                                 </svg>
@@ -78,6 +78,10 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+            
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                {{ $users->appends(request()->query())->links() }}
             </div>
         </div>
     </div>

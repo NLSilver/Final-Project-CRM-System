@@ -45,7 +45,7 @@
                                                 <p class="text-[10px] font-medium uppercase tracking-widest text-blue-500">
                                                     {{ $item->activity_type }}
                                                 </p>
-                                            @elseif($activeType === 'follow-ups')
+                                            @elseif($activeType === 'followups')
                                                 <p class="text-sm font-bold text-gray-800 truncate">
                                                     {{ $item->customer->full_name ?? $item->lead->full_name ?? 'Unknown Contact' }}
                                                 </p>
@@ -65,37 +65,37 @@
                                 </td>
 
                                 <td class="px-6 py-4 border-r border-gray-100 whitespace-nowrap">
-                                    <p class="text-xs font-medium group-hover:text-blue-600 transition-colors">Deleted {{ $item->deleted_at->diffForHumans() }}</p>
-                                    <p class="text-[10px] uppercase font-bold tracking-tight">{{ $item->deleted_at->format('M d, Y • h:i A') }}</p>
+                                    <p class="text-xs font-medium group-hover:text-blue-600 transition-colors text-gray-600">Deleted {{ $item->deleted_at->diffForHumans() }}</p>
+                                    <p class="text-[10px] uppercase font-bold tracking-tight text-gray-400">{{ $item->deleted_at->format('M d, Y • h:i A') }}</p>
                                 </td>
 
                                 <td class="px-6 py-4 text-sm text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         @if($activeType === 'customers' || $activeType === 'leads')
-                                        <a href="{{ route($activeType . '.show', $item->id) }}" class="p-1 group-hover:text-blue-600 transition-colors duration-200" title="View">
+                                        <a href="{{ route($activeType . '.show', $item->id) }}" class="p-1 text-gray-400 hover:text-blue-600 transition-colors duration-200" title="View">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                             </svg>
                                         </a>
-                                        <span class="text-gray-200 group-hover:text-gray-300 transition-colors">|</span>
+                                        <span class="text-gray-200">|</span>
                                         @endif
 
                                         <form action="{{ route('trash.restore', $item->id) }}" method="POST" class="flex items-center">
                                             @csrf
                                             <input type="hidden" name="type" value="{{ $activeType }}">
-                                            <button type="submit" class="p-1 group-hover:text-teal-600 transition-colors duration-200" title="Restore">
+                                            <button type="submit" class="p-1 text-gray-400 hover:text-teal-600 transition-colors duration-200" title="Restore">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                                 </svg>
                                             </button>
                                         </form>
 
-                                        <span class="text-gray-200 group-hover:text-gray-300 transition-colors">|</span>
+                                        <span class="text-gray-200">|</span>
                                         <form action="{{ route('trash.forceDelete', $item->id) }}" method="POST" class="flex items-center">
                                             @csrf @method('DELETE')
                                             <input type="hidden" name="type" value="{{ $activeType }}">
-                                            <button type="submit" class="p-1 group-hover:text-red-500 transition-colors duration-200" onclick="return confirm('Permanently purge this record?')" title="Delete Permanently">
+                                            <button type="submit" class="p-1 text-gray-400 hover:text-red-500 transition-colors duration-200" onclick="return confirm('Permanently purge this record?')" title="Delete Permanently">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                                 </svg>
@@ -113,6 +113,10 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                {{ $items->appends(request()->query())->links() }}
             </div>
         </div>
     </div>

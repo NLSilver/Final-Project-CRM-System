@@ -27,7 +27,22 @@ class Lead extends Model
             $lead->activities()->withTrashed()->restore();
             $lead->followUps()->withTrashed()->restore();
         });
+
+        static::updating(function ($lead) {
+            if ($lead->isDirty('status')) {
+                $oldStatus = $lead->getOriginal('status');
+                $newStatus = $lead->status;
+
+                $lead->activities()->create([
+                    'user_id'       => auth()->id() ?? $lead->assigned_user_id,
+                    'activity_type' => 'status_change',
+                    'description'   => "Lead status updated from '{$oldStatus}' to '{$newStatus}'.",
+                    'activity_date' => now(),
+                ]);
+            }
+        });
     }
+    
 
     public static function getStatuses()
     {
