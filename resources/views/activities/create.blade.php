@@ -11,9 +11,6 @@
         <form action="{{ route('activities.store') }}" method="POST" class="space-y-6">
             @csrf
 
-            <input type="hidden" name="customer_id" value="{{ request('type') == 'customer' ? request('id') : '' }}">
-            <input type="hidden" name="lead_id" value="{{ request('type') == 'lead' ? request('id') : '' }}">
-
             <div class="bg-white shadow-sm border border-gray-200 rounded-sm overflow-hidden">
                 <div class="bg-gray-50/50 border-b border-gray-100 px-6 py-4">
                     <h2 class="text-[11px] uppercase font-bold text-teal-700 tracking-widest">
@@ -51,11 +48,15 @@
                         @error('description') <p class="text-[10px] text-red-500 mt-1 font-bold uppercase">{{ $message }}</p> @enderror
                     </div>
 
-                    @if(!request()->has('id'))
+                    @if(request()->has('id'))
+                        <input type="hidden" name="customer_id" value="{{ request('type') == 'customer' ? request('id') : '' }}">
+                        <input type="hidden" name="lead_id" value="{{ request('type') == 'lead' ? request('id') : '' }}">
+                    @else
                         <div>
                             <label class="block text-[11px] uppercase font-bold text-gray-400 mb-1">Link to Customer</label>
-                            <select name="customer_id" class="w-full border-b border-gray-200 px-0 py-2 focus:ring-0 focus:border-teal-500 text-sm bg-transparent">
-                                <option value="">(Optional) Select Customer</option>
+                            <select name="customer_id" id="customer_select" onchange="toggleSelects('customer')"
+                                    class="w-full border-b border-gray-200 px-0 py-2 focus:ring-0 focus:border-teal-500 text-sm bg-transparent disabled:opacity-30 disabled:cursor-not-allowed">
+                                <option value="">Select Customer</option>
                                 @foreach($customers as $c)
                                     <option value="{{ $c->id }}" {{ old('customer_id') == $c->id ? 'selected' : '' }}>
                                         {{ $c->first_name }} {{ $c->last_name }}
@@ -66,8 +67,9 @@
 
                         <div>
                             <label class="block text-[11px] uppercase font-bold text-gray-400 mb-1">Link to Lead</label>
-                            <select name="lead_id" class="w-full border-b border-gray-200 px-0 py-2 focus:ring-0 focus:border-teal-500 text-sm bg-transparent">
-                                <option value="">(Optional) Select Lead</option>
+                            <select name="lead_id" id="lead_select" onchange="toggleSelects('lead')"
+                                    class="w-full border-b border-gray-200 px-0 py-2 focus:ring-0 focus:border-teal-500 text-sm bg-transparent disabled:opacity-30 disabled:cursor-not-allowed">
+                                <option value="">Select Lead</option>
                                 @foreach($leads as $l)
                                     <option value="{{ $l->id }}" {{ old('lead_id') == $l->id ? 'selected' : '' }}>
                                         {{ $l->name }}
@@ -87,4 +89,29 @@
             </div>
         </form>
     </div>
+
+    <script>
+        function toggleSelects(changedType) {
+            const customerSelect = document.getElementById('customer_select');
+            const leadSelect = document.getElementById('lead_select');
+
+            if (!customerSelect || !leadSelect) return;
+
+            if (changedType === 'customer') {
+                leadSelect.disabled = customerSelect.value !== "";
+                if (customerSelect.value !== "") leadSelect.value = "";
+            } else {
+                customerSelect.disabled = leadSelect.value !== "";
+                if (leadSelect.value !== "") customerSelect.value = "";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const customerSelect = document.getElementById('customer_select');
+            const leadSelect = document.getElementById('lead_select');
+            
+            if (customerSelect && customerSelect.value !== "") toggleSelects('customer');
+            if (leadSelect && leadSelect.value !== "") toggleSelects('lead');
+        });
+    </script>
 </x-app-layout>
